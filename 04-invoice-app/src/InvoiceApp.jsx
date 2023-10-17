@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-key */
+import { useState } from "react";
 import { getInvoice } from "./services/getInvoice";
 import { ClientView } from "./components/ClientView";
 import { CompanyView } from "./components/CompanyView";
@@ -7,7 +8,68 @@ import { ListItemsView } from "./components/ListItemsView";
 import { TotalView } from "./components/TotalView";
 
 export const InvoiceApp = () => {
-  const { total, id, name, client, company, items } = getInvoice();
+  const {
+    total,
+    id,
+    name,
+    client,
+    company,
+    items: ItemsInitial,
+  } = getInvoice();
+
+  const [formItemsState, setFormItemsState] = useState({
+    product: "",
+    price: "",
+    quantity: "",
+  });
+
+  const { product, price, quantity } = formItemsState;
+
+  const [items, setItems] = useState(ItemsInitial);
+
+  const [counter, setCounter] = useState(4);
+
+  const onInputChange = ({ target: { name, value } }) => {
+    console.log(name);
+    console.log(value);
+    setFormItemsState({
+      ...formItemsState,
+      [name]: value, //variable computada para poder diferenciarlas entre si por el tipo de nombre
+    });
+  };
+
+  const onInvoiceItemsSubmit = (event) => {
+    event.preventDefault();
+
+    if (product.trim().length <= 1) return;
+    if (price.trim().length <= 1) return;
+    if (isNaN(price.trim())) {
+      alert("Error!!! El precio no es un numero");
+      return;
+    }
+    if (quantity.trim().length < 1) return;
+
+    if (isNaN(quantity.trim())) {
+      alert("Error!!! La cantidad no es un numero");
+      return;
+    }
+
+    setItems([
+      ...items,
+      {
+        id: counter,
+        product: product.trim(),
+        price: +price.trim(),
+        quantity: parseInt(quantity.trim(), 10),
+      },
+    ]);
+    setFormItemsState({
+      product: "",
+      price: "",
+      quantity: "",
+    });
+    setCounter(counter + 1);
+  };
 
   return (
     <>
@@ -26,6 +88,35 @@ export const InvoiceApp = () => {
             </div>
             <ListItemsView title="Productos de la factura" items={items} />
             <TotalView total={total} />
+            <form className="w-50" onSubmit={onInvoiceItemsSubmit}>
+              <input
+                type="text"
+                name="product"
+                value={product}
+                placeholder="Producto"
+                className="form-control m-3"
+                onChange={onInputChange}
+              ></input>
+              <input
+                type="text"
+                name="price"
+                value={price}
+                placeholder="Precio"
+                className="form-control m-3"
+                onChange={onInputChange}
+              ></input>
+              <input
+                type="text"
+                name="quantity"
+                value={quantity}
+                placeholder="Cantidad"
+                className="form-control m-3"
+                onChange={(event) => onInputChange(event)} //Metodo de referencia
+              ></input>
+              <button type="submit" className="btn btn-primary m-3">
+                Nuevo Item
+              </button>
+            </form>
           </div>
         </div>
       </div>
