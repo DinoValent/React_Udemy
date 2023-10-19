@@ -6,6 +6,7 @@ import { CompanyView } from "./components/CompanyView";
 import { InvoiceView } from "./components/InvoiceView";
 import { ListItemsView } from "./components/ListItemsView";
 import { TotalView } from "./components/TotalView";
+import { FormItemsView } from "./components/FormItemsView";
 
 const invoiceInitial = {
   id: 0,
@@ -28,18 +29,14 @@ const invoiceInitial = {
 };
 
 export const InvoiceApp = () => {
+  const [activeForm, setActiveForm] = useState(false);
   const [total, setTotal] = useState(0);
   const [invoice, setInvoice] = useState(invoiceInitial);
   const [items, setItems] = useState([]);
-  const [formItemsState, setFormItemsState] = useState({
-    product: "",
-    price: "",
-    quantity: "",
-  });
+
   const [counter, setCounter] = useState(4);
 
   const { id, name, client, company } = invoice;
-  const { product, price, quantity } = formItemsState;
 
   useEffect(() => {
     const data = getInvoice();
@@ -48,47 +45,11 @@ export const InvoiceApp = () => {
     setItems(data.items); //Pasamos los items al estado
   }, []);
 
-  // useEffect(() => {
-  //   // console.log("el precio cambio");
-  // }, [price]);
-
-  // useEffect(() => {
-  //   // console.log("algo a cambiado!!");
-  // }, [formItemsState]);
-
-  // useEffect(() => {
-  //   // console.log("el counter cambio!!");
-  // }, [counter]);
-
   useEffect(() => {
     setTotal(calculateTotal(items));
   }, [items]);
 
-  const onInputChange = ({ target: { name, value } }) => {
-    // console.log(name);
-    // console.log(value);
-    setFormItemsState({
-      ...formItemsState,
-      [name]: value, //variable computada para poder diferenciarlas entre si por el tipo de nombre
-    });
-  };
-
-  const onInvoiceItemsSubmit = (event) => {
-    event.preventDefault();
-
-    if (product.trim().length <= 1) return;
-    if (price.trim().length <= 1) return;
-    if (isNaN(price.trim())) {
-      alert("Error!!! El precio no es un numero");
-      return;
-    }
-    if (quantity.trim().length < 1) return;
-
-    if (isNaN(quantity.trim())) {
-      alert("Error!!! La cantidad no es un numero");
-      return;
-    }
-
+  const handlerAddItems = ({ product, price, quantity }) => {
     setItems([
       ...items,
       {
@@ -98,12 +59,16 @@ export const InvoiceApp = () => {
         quantity: parseInt(quantity.trim(), 10),
       },
     ]);
-    setFormItemsState({
-      product: "",
-      price: "",
-      quantity: "",
-    });
+
     setCounter(counter + 1);
+  };
+
+  const handlerDeleteItem = (id) => {
+    setItems(items.filter((item) => item.id !== id));
+  };
+
+  const onActiveForm = () => {
+    setActiveForm(!activeForm);
   };
 
   return (
@@ -121,37 +86,18 @@ export const InvoiceApp = () => {
                 <CompanyView title="Datos de la empresa" company={company} />
               </div>
             </div>
-            <ListItemsView title="Productos de la factura" items={items} />
+            <ListItemsView
+              title="Productos de la factura"
+              items={items}
+              handlerDeleteItem={(id) => handlerDeleteItem(id)}
+            />
             <TotalView total={total} />
-            <form className="w-50" onSubmit={onInvoiceItemsSubmit}>
-              <input
-                type="text"
-                name="product"
-                value={product}
-                placeholder="Producto"
-                className="form-control m-3"
-                onChange={onInputChange}
-              ></input>
-              <input
-                type="text"
-                name="price"
-                value={price}
-                placeholder="Precio"
-                className="form-control m-3"
-                onChange={onInputChange}
-              ></input>
-              <input
-                type="text"
-                name="quantity"
-                value={quantity}
-                placeholder="Cantidad"
-                className="form-control m-3"
-                onChange={(event) => onInputChange(event)} //Metodo de referencia
-              ></input>
-              <button type="submit" className="btn btn-primary m-3">
-                Nuevo Item
-              </button>
-            </form>
+            <button className="btn btn-secondary" onClick={onActiveForm}>
+              {!activeForm ? "Agregar Item" : "Ocultar Form"}
+            </button>
+            {!activeForm || (
+              <FormItemsView handler={(newItem) => handlerAddItems(newItem)} />
+            )}
           </div>
         </div>
       </div>
