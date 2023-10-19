@@ -1,37 +1,72 @@
 /* eslint-disable react/jsx-key */
-import { useState } from "react";
-import { getInvoice } from "./services/getInvoice";
+import { useEffect, useState } from "react";
+import { getInvoice, calculateTotal } from "./services/getInvoice";
 import { ClientView } from "./components/ClientView";
 import { CompanyView } from "./components/CompanyView";
 import { InvoiceView } from "./components/InvoiceView";
 import { ListItemsView } from "./components/ListItemsView";
 import { TotalView } from "./components/TotalView";
 
-export const InvoiceApp = () => {
-  const {
-    total,
-    id,
-    name,
-    client,
-    company,
-    items: ItemsInitial,
-  } = getInvoice();
+const invoiceInitial = {
+  id: 0,
+  name: "",
+  client: {
+    name: "",
+    lastname: "",
+    address: {
+      country: "",
+      city: "",
+      street: "",
+      number: 0,
+    },
+  },
+  company: {
+    name: "",
+    fiscalNumber: 0,
+  },
+  items: [],
+};
 
+export const InvoiceApp = () => {
+  const [total, setTotal] = useState(0);
+  const [invoice, setInvoice] = useState(invoiceInitial);
+  const [items, setItems] = useState([]);
   const [formItemsState, setFormItemsState] = useState({
     product: "",
     price: "",
     quantity: "",
   });
-
-  const { product, price, quantity } = formItemsState;
-
-  const [items, setItems] = useState(ItemsInitial);
-
   const [counter, setCounter] = useState(4);
 
+  const { id, name, client, company } = invoice;
+  const { product, price, quantity } = formItemsState;
+
+  useEffect(() => {
+    const data = getInvoice();
+    console.log(data);
+    setInvoice(data);
+    setItems(data.items); //Pasamos los items al estado
+  }, []);
+
+  // useEffect(() => {
+  //   // console.log("el precio cambio");
+  // }, [price]);
+
+  // useEffect(() => {
+  //   // console.log("algo a cambiado!!");
+  // }, [formItemsState]);
+
+  // useEffect(() => {
+  //   // console.log("el counter cambio!!");
+  // }, [counter]);
+
+  useEffect(() => {
+    setTotal(calculateTotal(items));
+  }, [items]);
+
   const onInputChange = ({ target: { name, value } }) => {
-    console.log(name);
-    console.log(value);
+    // console.log(name);
+    // console.log(value);
     setFormItemsState({
       ...formItemsState,
       [name]: value, //variable computada para poder diferenciarlas entre si por el tipo de nombre
