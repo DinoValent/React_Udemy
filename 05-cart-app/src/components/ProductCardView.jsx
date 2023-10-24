@@ -1,8 +1,13 @@
+import { useNavigate } from "react-router-dom";
+
 /* eslint-disable react/prop-types */
 export const ProductCardView = ({ handler, id, name, description, price }) => {
+  const navigate = useNavigate();
+
   const onAddProduct = (product) => {
     console.log(product);
     handler(product);
+    navigate("/cart");
   };
   return (
     <div>
