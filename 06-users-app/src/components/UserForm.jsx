@@ -1,14 +1,14 @@
-import { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 
-const initialUserForm = {
-  username: "",
-  password: "",
-  email: "",
-};
-export const UserForm = ({ handlerAddUser, initialUserForm }) => {
+export const UserForm = ({ userSelected, handlerAddUser, initialUserForm }) => {
   const [userForm, setUserForm] = useState(initialUserForm);
 
-  const { username, password, email } = userForm;
+  const { id, username, password, email } = userForm;
+
+  useEffect(() => {
+    setUserForm({ ...userSelected });
+  }, [userSelected]);
 
   const onInputChange = ({ target }) => {
     const { name, value } = target;
@@ -54,8 +54,9 @@ export const UserForm = ({ handlerAddUser, initialUserForm }) => {
         onChange={onInputChange}
         value={email}
       />
+      <input type="hidden" name="id" value={id} />
       <button className="btn btn-primary" type="submit">
-        Crear
+        {id > 0 ? "Editar" : "Crear"}
       </button>
     </form>
   );
