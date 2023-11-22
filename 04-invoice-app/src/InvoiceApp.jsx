@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-key */
+import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import { getInvoice, calculateTotal } from "./services/getInvoice";
 import { ClientView } from "./components/ClientView";

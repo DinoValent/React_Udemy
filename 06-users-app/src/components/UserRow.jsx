@@ -5,7 +5,6 @@ export const UserRow = ({
   id,
   username,
   email,
-  password,
 }) => {
   return (
     <tr>
@@ -21,7 +20,6 @@ export const UserRow = ({
               id,
               username,
               email,
-              password,
             });
           }}
         >
