@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 /* eslint-disable react/prop-types */
 export const UserRow = ({
   handlerUserSelectedForm,
@@ -25,6 +27,11 @@ export const UserRow = ({
         >
           Update
         </button>
+      </td>
+      <td>
+        <NavLink className="btn btn-secondary btn-sm" to={"/users/edit/" + id}>
+          Update route
+        </NavLink>
       </td>
       <td>
         <button
